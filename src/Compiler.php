@@ -1168,7 +1168,11 @@ class Compiler
                 // user defined function?
                 $func = $this->get(self::$namespaces['function'] . $name, false);
 
-                if ($func) {
+				if ($this->isScssExtension($func)) {
+					return $this->executeScssExtension($func, $argValues);
+
+				} else if ($func) {
+
                     $this->pushEnv();
 
                     // set the args
@@ -1208,6 +1212,41 @@ class Compiler
                 return $value;
         }
     }
+
+	private $extensions = array();
+
+	/**
+	 * @param string $extKey
+	 * @param $extension
+	 */
+	public function addExtension($extKey, $extension)
+	{
+		$this->extensions[$extKey] = $extension;
+	}
+
+	/**
+	 * @param stdClass $func
+	 * @param $argValues
+	 * @return mixed
+	 */
+	private function executeScssExtension($func, $argValues)
+	{
+//		$this->pushEnv();
+//		if (isset($func->args)) {
+//			$this->applyArguments($func->args, $argValues);
+//		}
+
+		$callable = $this->extensions[$func->name];
+
+//		$this->popEnv();
+
+		return $callable($argValues);
+	}
+
+	private function isScssExtension($func)
+	{
+		return array_key_exists($func->name, $this->extensions);
+	}
 
     public function normalizeValue($value)
     {
