@@ -1245,7 +1245,7 @@ class Compiler
 
 	private function isScssExtension($func)
 	{
-		return array_key_exists($func->name, $this->extensions);
+		return (false !== $func) && array_key_exists($func->name, $this->extensions);
 	}
 
     public function normalizeValue($value)
